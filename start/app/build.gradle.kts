@@ -55,6 +55,8 @@ android {
     }
 }
 
+tasks.register("prepareKotlinBuildScriptModel") {}
+
 ktfmt {
     googleStyle()
 }
