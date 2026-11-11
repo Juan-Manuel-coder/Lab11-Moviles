@@ -1,19 +1,3 @@
-/*
-Copyright 2022 Google LLC
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
- */
-
 package com.example.makeitso.screens.tasks
 
 import android.annotation.SuppressLint
@@ -28,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle // <-- IMPORT AGREGADO
 import com.example.makeitso.R.drawable as AppIcon
 import com.example.makeitso.R.string as AppText
 import com.example.makeitso.common.composable.ActionToolbar
@@ -42,12 +27,16 @@ fun TasksScreen(
   openScreen: (String) -> Unit,
   viewModel: TasksViewModel = hiltViewModel()
 ) {
+  // Recolectamos las tareas de Firestore
+  val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
+
   TasksScreenContent(
     onAddClick = viewModel::onAddClick,
     onSettingsClick = viewModel::onSettingsClick,
     onTaskCheckChange = viewModel::onTaskCheckChange,
     onTaskActionClick = viewModel::onTaskActionClick,
-    openScreen = openScreen
+    openScreen = openScreen,
+    tasks = tasks.value // <-- Le pasamos la lista
   )
 
   LaunchedEffect(viewModel) { viewModel.loadTaskOptions() }
@@ -62,7 +51,8 @@ fun TasksScreenContent(
   onSettingsClick: ((String) -> Unit) -> Unit,
   onTaskCheckChange: (Task) -> Unit,
   onTaskActionClick: ((String) -> Unit, Task, String) -> Unit,
-  openScreen: (String) -> Unit
+  openScreen: (String) -> Unit,
+  tasks: List<Task> // <-- Recibimos la lista
 ) {
   Scaffold(
     floatingActionButton = {
@@ -87,10 +77,10 @@ fun TasksScreenContent(
       Spacer(modifier = Modifier.smallSpacer())
 
       LazyColumn {
-        items(emptyList<Task>(), key = { it.id }) { taskItem ->
+        items(tasks, key = { it.id }) { taskItem -> // <-- Usamos 'tasks'
           TaskItem(
             task = taskItem,
-            options = listOf(),
+            options = emptyList(),
             onCheckChange = { onTaskCheckChange(taskItem) },
             onActionClick = { action -> onTaskActionClick(openScreen, taskItem, action) }
           )
@@ -110,7 +100,8 @@ fun TasksScreenPreview() {
       onSettingsClick = { },
       onTaskCheckChange = { },
       onTaskActionClick = { _, _, _ -> },
-      openScreen = { }
+      openScreen = { },
+      tasks = emptyList() // <-- AGREGADO: Pasamos una lista vacía en el Preview
     )
   }
 }
