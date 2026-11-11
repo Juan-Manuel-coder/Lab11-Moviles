@@ -40,8 +40,13 @@ fun SettingsScreen(
   openScreen: (String) -> Unit,
   viewModel: SettingsViewModel = hiltViewModel()
 ) {
+  // CORRECCIÓN: Recolectamos el estado del ViewModel como un valor, no como un Flow
+  val uiState by viewModel.uiState.collectAsState(
+    initial = SettingsUiState(false)
+  )
+
   SettingsScreenContent(
-    uiState = viewModel.uiState,
+    uiState = uiState, // Ahora sí es un SettingsUiState
     onLoginClick = { viewModel.onLoginClick(openScreen) },
     onSignUpClick = { viewModel.onSignUpClick(openScreen) },
     onSignOutClick = { viewModel.onSignOutClick(restartApp) },
@@ -141,11 +146,12 @@ private fun DeleteMyAccountCard(deleteMyAccount: () -> Unit) {
 @ExperimentalMaterialApi
 @Composable
 fun SettingsScreenPreview() {
-  val uiState = SettingsUiState(isAnonymousAccount = false)
+  // CORRECCIÓN: En el Preview no podemos usar viewModel, así que creamos un estado falso
+  val fakeUiState = SettingsUiState(isAnonymousAccount = true)
 
   MakeItSoTheme {
     SettingsScreenContent(
-      uiState = uiState,
+      uiState = fakeUiState,
       onLoginClick = { },
       onSignUpClick = { },
       onSignOutClick = { },
