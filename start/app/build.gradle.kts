@@ -7,7 +7,6 @@ plugins {
     id("com.google.firebase.firebase-perf")
     id("dagger.hilt.android.plugin")
     id("com.ncorti.ktfmt.gradle") version "0.10.0"
-    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -93,6 +92,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-perf-ktx")
     //Test
     testImplementation("junit:junit:4.+")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
