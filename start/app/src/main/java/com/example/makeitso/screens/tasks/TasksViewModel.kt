@@ -40,7 +40,7 @@ class TasksViewModel @Inject constructor(
   val tasks = storageService.tasks
 
   fun loadTaskOptions() {
-    //TODO
+    options.value = TaskActionOption.values().map { it.title }
   }
 
   fun onTaskCheckChange(task: Task) {
